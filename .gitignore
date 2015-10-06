@@ -17,7 +17,6 @@
 .ensime*
 .eprj
 .history
-.idea
 .manager
 .multi-jvm
 .project
