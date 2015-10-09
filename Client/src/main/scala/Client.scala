@@ -6,34 +6,40 @@ import akka.actor._
 import akka.pattern._
 import akka.util.Timeout
 
-object MyInt {
-  implicit def intToMyInt(x: Int): MyInt = new MyInt(x)
-  def apply(x: Int): MyInt = new MyInt(x)
+object Test {
+  case class Thunk[X](xT: () => X) {
+    def >>=[Y](x2yT: X => Thunk[Y]): Thunk[_] = {
+      print(">>=\n")
+      x2yT(xT()).xT()
+    }
+    def |~[Y](x2y: X => Y): Thunk[Y] = x2y(xT())
+    def run() = xT()
+  }
+
+  implicit def result[X](x: X): Thunk[X] = Thunk (() => x)
+
+  val x = result(1) |~ { x => x * x }
+
+  val nested =
+    2 >>= {
+      _ + 1 >>= {
+        _ * 2 >>= { x =>
+          val y = 10
+          val z = y + 1
+          x - z >>= { x => x }
+        }
+      }
+    } //|~ { x => x * x }
+
+  val nonNested =
+    result(1) >>= { x =>
+      result(x + 1) } >>= { x =>
+      result(x * 2) } >>= { x =>
+      val y = 10
+      val z = y + 1
+      result (x - z)
+    } >>= result
 }
-
-class MyInt(value: Int) {
-  def ===>(that: MyInt): Boolean = this == that
-  def eq(that: MyInt): Boolean = this ===> that
-}
-
-object Another {
-  import MyInt._
-
-  val _1 = 1 ===> MyInt(2)
-  val _2 = 1 ===> 2
-  val _3 = 1 eq 2
-}
-
-
-
-
-
-
-
-
-
-
-
 
 class Client() extends Actor with ActorLogging {
   log.info("Client started!")
