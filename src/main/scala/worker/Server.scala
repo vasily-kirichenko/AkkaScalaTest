@@ -17,9 +17,9 @@ class Server() extends Actor with ActorLogging {
   var count = 0
 
   override def receive = {
-    case msg: String => {
+    case CalculateFib(n) => {
       count = count + 1
-      sender() ! s"Response for $msg, fib(30) = ${Fib.fib(30)}"
+      sender() ! FibResult(n, Fib.fib(n))
       if (count % 1000 == 0) {
         log.info (s"$count total, ${1000.0 * count / (System.currentTimeMillis - started)} /s")
       }

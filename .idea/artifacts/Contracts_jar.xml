@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Contracts:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Contracts_jar</output-path>
+    <root id="archive" name="Contracts.jar">
+      <element id="module-output" name="Contracts" />
+      <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

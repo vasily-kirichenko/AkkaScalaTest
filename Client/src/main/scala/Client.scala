@@ -44,21 +44,25 @@ class Client() extends Actor with ActorLogging {
   var started = System.currentTimeMillis
   val server = context.actorSelection("akka.tcp://ClusterSystem@127.0.0.1:2551/user/server")
   log.info(s"Server = $server")
-  implicit val timeout = Timeout(5, TimeUnit.SECONDS)
+  //implicit val timeout = Timeout(5, TimeUnit.SECONDS)
 
-  def sendRequest(): Unit = {
-    count = count + 1
-    server ? CalculateFib(20)
-    if (count % 1000 == 0) {
-      log.info (s"$count total, ${1000.0 * count / (System.currentTimeMillis - started)} /s")
+  object Sender {
+    def sendRequest(): Unit = {
+      count = count + 1
+      server ! CalculateFib(20)
+      if (count % 1000 == 0) {
+        log.info(s"$count total, ${1000.0 * count / (System.currentTimeMillis - started)} /s")
+      }
     }
   }
 
+  def indirectSendRequest(sender: { def sendRequest() }) = sender.sendRequest()
+
   override def preStart(): Unit = {
-    sendRequest()
+    indirectSendRequest(Sender)
   }
 
   override def receive = {
-    case msg: String => sendRequest()
+    case FibResult(_,_) => indirectSendRequest(Sender)
   }
 }
