@@ -68,7 +68,6 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.8/quasiquotes_2.10-2.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <LIBRARY_FILE />
         <SOURCES />
       </library>
     </orderEntry>

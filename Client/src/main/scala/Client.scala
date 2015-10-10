@@ -8,37 +8,34 @@ import akka.util.Timeout
 
 object Test {
   case class Thunk[X](xT: () => X) {
-    def >>=[Y](x2yT: X => Thunk[Y]): Thunk[_] = {
+    def >>=[Y](x2yT: X => Thunk[Y]): Thunk[Y] = {
       print(">>=\n")
       x2yT(xT()).xT()
     }
-    def |~[Y](x2y: X => Y): Thunk[Y] = x2y(xT())
     def run() = xT()
   }
 
   implicit def result[X](x: X): Thunk[X] = Thunk (() => x)
 
-  val x = result(1) |~ { x => x * x }
-
-  val nested =
+  val nested: Thunk[Int] =
     2 >>= {
-      _ + 1 >>= {
-        _ * 2 >>= { x =>
+      x => x + 1 >>= {
+        x => x * 2 >>= { x =>
           val y = 10
           val z = y + 1
           x - z >>= { x => x }
         }
       }
-    } //|~ { x => x * x }
+    }
 
   val nonNested =
-    result(1) >>= { x =>
-      result(x + 1) } >>= { x =>
-      result(x * 2) } >>= { x =>
+    1 >>= { x =>
+      x + 1 } >>= { x =>
+      x * 2 } >>= { x =>
       val y = 10
       val z = y + 1
-      result (x - z)
-    } >>= result
+      x - z
+    } //>>= result
 }
 
 class Client() extends Actor with ActorLogging {
